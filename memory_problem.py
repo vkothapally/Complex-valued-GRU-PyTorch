@@ -19,8 +19,8 @@ if __name__ == '__main__':
     print("Baseline is " + str(baseline))
     batch_size = 100
     lr = 0.001 #2e-2
-    # cell = ComplexCell(hidden_size=128, input_size=10)
-    cell = SimpleRecurrentCell(hidden_size=128, input_size=10)
+    cell = ComplexCell(hidden_size=128, input_size=10)
+    # cell = SimpleRecurrentCell(hidden_size=128, input_size=10)
     # cell = CustomGRU(hidden_size=64, input_size=10)
     # cell.reset_parameters()
     # cell = torch.nn.GRUCell(hidden_size=256, input_size=10)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         acc = acc/(batch_size * 10.)
 
         if i % 25 == 0:
-            print(i, "{:2.2f}".format(loss.item()), "{:2.2f}".format(acc), "{:2.2f}".format(i/iterations))
+            print(i, "loss: {:2.2f}".format(loss.item()), "acc: {:2.2f}".format(acc), "frac done: {:2.2f}".format(i/iterations))
         if i % 250 == 0:
             print(yy[0, :])
             print(y_net[0, :])
