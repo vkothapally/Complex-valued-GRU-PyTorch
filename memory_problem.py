@@ -2,11 +2,12 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from src.adding_memory_problems import generate_data_memory
-from src.rnn import SimpleRecurrentCell, RecurrentLayer
+from src.rnn import SimpleRecurrentCell, RecurrentLayer, ComplexCell
 from src.opt import StiefelOptimizer
 
 
 if __name__ == '__main__':
+    # TODO: Add an argparse
     n_train = int(10e5)
     n_test = int(1e4)
     time_steps = 1
@@ -18,13 +19,14 @@ if __name__ == '__main__':
     print("Baseline is " + str(baseline))
     batch_size = 100
     lr = 0.001 #2e-2
+    # cell = ComplexCell(hidden_size=128, input_size=10)
     cell = SimpleRecurrentCell(hidden_size=128, input_size=10)
     # cell = CustomGRU(hidden_size=64, input_size=10)
     # cell.reset_parameters()
     # cell = torch.nn.GRUCell(hidden_size=256, input_size=10)
     model = RecurrentLayer(cell=cell, output_size=10)
-    #optimizer = StiefelOptimizer(model.parameters(), lr=lr)
-    optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
+    optimizer = StiefelOptimizer(model.parameters(), lr=lr)
+    #optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
 
     # cost = torch.nn.MSELoss()
 
@@ -64,7 +66,7 @@ if __name__ == '__main__':
         # forward
         # with torch.autograd.set_detect_anomaly(True):
         if 1:
-            zero_state =  torch.zeros(batch_size, cell.hidden_size)
+            zero_state =  model.zero_state(batch_size)
             out_tensor = model.forward(input_series=x,
                                        steps=time_steps+20,
                                        init_state=zero_state)
@@ -84,14 +86,14 @@ if __name__ == '__main__':
         acc = acc/(batch_size * 10.)
 
         if i % 25 == 0:
-            print(i, loss.item(), acc, i/iterations)
+            print(i, "{:2.2f}".format(loss.item()), "{:2.2f}".format(acc), "{:2.2f}".format(i/iterations))
         if i % 250 == 0:
             print(yy[0, :])
             print(y_net[0, :])
-            if type(cell) == SimpleRecurrentCell:
+            if type(cell) is SimpleRecurrentCell or type(cell) is ComplexCell:
                 try:
                     norm = torch.linalg.norm(cell.weight_recurrent, ord=2).item()
-                    print('norm', norm)
+                    print('norm {:2.2f}'.format(norm))
                     norm_lst.append(norm)
                 except:
                     print('norm', 'nan')

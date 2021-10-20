@@ -37,8 +37,8 @@ class StiefelOptimizer(torch.optim.RMSprop):
                     # http://noodle.med.yale.edu/~hdtag/notes/steifel_notes.pdf
                     assert p.shape[0] == p.shape[1]
                     eye = torch.eye(p.shape[0])
-                    A = torch.matmul(grad, p.t()) \
-                        - torch.matmul(p, grad.t())
+                    A = torch.matmul(grad, p.t().conj()) \
+                        - torch.matmul(p, grad.t().conj())
                     cayleyDenom = eye + (group['lr']/2.0) * A
                     cayleyNumer = eye - (group['lr']/2.0) * A
                     C = torch.matmul(torch.inverse(cayleyDenom), cayleyNumer)
